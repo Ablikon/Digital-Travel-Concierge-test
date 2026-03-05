@@ -4,9 +4,16 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { StoreProvider } from '@/app/providers';
+import { ErrorBoundary } from '@/shared/ui';
 import { useAppSelector } from '@/shared/lib/hooks';
+import { useNotifications } from '@/features/notifications';
 
 SplashScreen.preventAutoHideAsync();
+
+function NotificationInit() {
+  useNotifications();
+  return null;
+}
 
 function AuthGate({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -34,28 +41,33 @@ function RootNavigation() {
   }, []);
 
   return (
-    <AuthGate>
-      <StatusBar style="dark" />
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(auth)" />
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen
-          name="article/[id]"
-          options={{ animation: 'slide_from_right' }}
-        />
-        <Stack.Screen
-          name="webview"
-          options={{ animation: 'slide_from_bottom', presentation: 'modal' }}
-        />
-      </Stack>
-    </AuthGate>
+    <>
+      <NotificationInit />
+      <AuthGate>
+        <StatusBar style="dark" />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(auth)" />
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen
+            name="article/[id]"
+            options={{ animation: 'slide_from_right' }}
+          />
+          <Stack.Screen
+            name="webview"
+            options={{ animation: 'slide_from_bottom', presentation: 'modal' }}
+          />
+        </Stack>
+      </AuthGate>
+    </>
   );
 }
 
 export default function RootLayout() {
   return (
-    <StoreProvider>
-      <RootNavigation />
-    </StoreProvider>
+    <ErrorBoundary>
+      <StoreProvider>
+        <RootNavigation />
+      </StoreProvider>
+    </ErrorBoundary>
   );
 }

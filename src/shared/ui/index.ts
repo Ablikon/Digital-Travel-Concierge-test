@@ -6,3 +6,4 @@ export { SearchInput } from './input';
 export { Chip } from './chip';
 export { ScreenHeader } from './screen-header';
 export { ImageWithFallback } from './image-with-fallback';
+export { ErrorBoundary } from './error-boundary';
