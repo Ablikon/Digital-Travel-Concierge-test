@@ -1,17 +1,23 @@
 import { useState, useEffect } from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { useAppDispatch, useAppSelector } from '@/shared/lib/hooks';
-import { setCategory } from '@/features/filter-news/model';
+import { Ionicons, AntDesign } from '@expo/vector-icons';
+import { useAppDispatch, useAppSelector, useDebounce } from '@/shared/lib/hooks';
+import { setCategory, setSearchQuery } from '@/features/filter-news/model';
 import { loadFavorites } from '@/features/manage-favorites/model';
 import { NEWS_CATEGORIES, type NewsCategory } from '@/shared/config/constants';
-import { Chip } from '@/shared/ui';
+import { Chip, SearchInput } from '@/shared/ui';
+import { SortOptions } from '@/features/search-news';
 import { NewsList } from '@/widgets/news-list';
+import { SearchResults } from '@/widgets/search-results';
 
 export default function NewsScreen() {
   const dispatch = useAppDispatch();
   const selectedCategory = useAppSelector((state) => state.filters.selectedCategory);
+  const searchQuery = useAppSelector((state) => state.filters.searchQuery);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  const debouncedQuery = useDebounce(searchQuery, 600);
 
   useEffect(() => {
     dispatch(loadFavorites());
@@ -21,44 +27,77 @@ export default function NewsScreen() {
     dispatch(setCategory(selectedCategory === cat ? null : cat));
   }
 
+  function toggleSearch() {
+    if (isSearchOpen) {
+      dispatch(setSearchQuery(''));
+    }
+    setIsSearchOpen(!isSearchOpen);
+  }
+
   return (
     <SafeAreaView className="flex-1 bg-surface-secondary" edges={['top']}>
-      <View className="border-b border-neutral-100 bg-white px-5 pb-4 pt-3">
-        <View className="flex-row items-center justify-between">
+      <View className="border-b border-neutral-100 bg-white">
+        <View className="flex-row items-center justify-between px-5 pb-2 pt-3">
           <View>
             <Text className="text-2xl font-bold text-neutral-800">Discover</Text>
             <Text className="mt-0.5 text-xs text-neutral-400">
               Stay updated with latest news
             </Text>
           </View>
-          <View className="h-10 w-10 items-center justify-center rounded-full bg-primary-50">
-            <Ionicons name="globe-outline" size={22} color="#4F46E5" />
-          </View>
+          <Pressable
+            onPress={toggleSearch}
+            className="h-10 w-10 items-center justify-center rounded-full bg-primary-50 active:bg-primary-100"
+          >
+            <AntDesign
+              name={isSearchOpen ? 'close' : 'search'}
+              size={20}
+              color="#4F46E5"
+            />
+          </Pressable>
         </View>
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          className="mt-4"
-          contentContainerStyle={{ paddingRight: 16 }}
-        >
-          <Chip
-            label="All"
-            selected={selectedCategory === null}
-            onPress={() => dispatch(setCategory(null))}
-          />
-          {NEWS_CATEGORIES.map((cat) => (
-            <Chip
-              key={cat}
-              label={cat}
-              selected={selectedCategory === cat}
-              onPress={() => handleCategoryPress(cat)}
+        {isSearchOpen && (
+          <View className="px-4 pb-3">
+            <SearchInput
+              value={searchQuery}
+              onChangeText={(text) => dispatch(setSearchQuery(text))}
+              placeholder="Search news articles..."
+              autoFocus
             />
-          ))}
-        </ScrollView>
+          </View>
+        )}
+
+        {isSearchOpen && debouncedQuery.length >= 2 && <SortOptions />}
+
+        {!isSearchOpen && (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            className="pb-3"
+            contentContainerStyle={{ paddingHorizontal: 16 }}
+          >
+            <Chip
+              label="All"
+              selected={selectedCategory === null}
+              onPress={() => dispatch(setCategory(null))}
+            />
+            {NEWS_CATEGORIES.map((cat) => (
+              <Chip
+                key={cat}
+                label={cat}
+                selected={selectedCategory === cat}
+                onPress={() => handleCategoryPress(cat)}
+              />
+            ))}
+          </ScrollView>
+        )}
       </View>
 
-      <NewsList category={selectedCategory ?? undefined} />
+      {isSearchOpen ? (
+        <SearchResults query={debouncedQuery} />
+      ) : (
+        <NewsList category={selectedCategory ?? undefined} />
+      )}
     </SafeAreaView>
   );
 }
