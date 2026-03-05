@@ -58,7 +58,7 @@ A cross-platform mobile application built with **React Native (Expo)** that deli
 │   └── shared/             # Shared code
 │       ├── api/            # RTK Query base configuration
 │       ├── config/         # Constants, API keys
-│       ├── lib/            # Hooks (useAppDispatch, useDebounce), utilities
+│       ├── lib/            # Hooks (useDebounce), utilities, navigation helpers
 │       ├── types/          # TypeScript interfaces
 │       └── ui/             # Reusable components (Button, Chip, Spinner, etc.)
 └── __tests__/              # Unit tests
@@ -70,7 +70,7 @@ A cross-platform mobile application built with **React Native (Expo)** that deli
 - **npm** or **yarn**
 - **Expo CLI**: `npm install -g expo-cli`
 - **Expo Go** app on your device (iOS/Android) for development
-- **NewsAPI Key** (optional, uses demo key by default)
+- **NewsAPI Key** — free at [newsapi.org/register](https://newsapi.org/register)
 
 ## Installation
 
@@ -81,6 +81,10 @@ cd Digital-Travel-Concierge-test
 
 # Install dependencies
 npm install
+
+# Set up environment variables
+cp .env.example .env
+# Then edit .env and add your NewsAPI key
 
 # Start the development server
 npx expo start
@@ -106,17 +110,13 @@ Scan the QR code with **Expo Go** (Android) or the Camera app (iOS) to run on a 
 
 ## API Configuration
 
-The app uses [NewsAPI](https://newsapi.org/) for fetching news articles. By default, it uses a demo key with limited requests.
+The app uses [NewsAPI](https://newsapi.org/) for fetching news articles.
 
-To use your own key:
-
-1. Sign up at [newsapi.org](https://newsapi.org/register)
+1. Sign up at [newsapi.org](https://newsapi.org/register) (free, 100 requests/day)
 2. Copy your API key
-3. Update `src/shared/config/constants.ts`:
+3. Set `EXPO_PUBLIC_NEWS_API_KEY` in your `.env` file
 
-```typescript
-export const NEWS_API_KEY = 'your-api-key-here';
-```
+> **Note:** The API key is loaded from environment variables and is **never** hardcoded or committed to the repository.
 
 ## Testing
 
@@ -163,18 +163,25 @@ Tailwind CSS utility classes accelerate UI development while maintaining consist
 ### Why expo-file-system/legacy?
 Expo SDK 55 introduced a new File/Directory-based API. The legacy API is used for broader compatibility with download progress callbacks and file system operations.
 
+## Web Deployment (Vercel)
+
+The project is configured for Vercel deployment out of the box:
+
+```bash
+# Build for web locally
+npm run build:web
+```
 ## Building for Production
 
 ```bash
 # Build for iOS
-npx expo build:ios
+npx eas build --platform ios
 
 # Build for Android
-npx expo build:android
-
-# Or use EAS Build (recommended)
-npx eas build --platform ios
 npx eas build --platform android
+
+# Export for web
+npm run build:web
 ```
 
 ## License
