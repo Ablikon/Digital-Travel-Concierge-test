@@ -1,15 +1,18 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { FlatList, View, Text, Alert } from 'react-native';
 import { router } from 'expo-router';
-import { ArticleCardCompact } from '@/entities/article/ui/ArticleCardCompact';
+import { ArticleCardCompact } from '@/entities/article';
 import { EmptyState, Spinner } from '@/shared/ui';
-import { useAppDispatch, useAppSelector } from '@/shared/lib/hooks';
-import { toggleFavorite, removeFavorite, persistFavorites } from '../model';
+import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
+import { navigateToArticle } from '@/shared/lib/navigation';
+import { removeFavorite, persistFavorites } from '../model';
+import { useToggleFavorite } from '../lib/use-toggle-favorite';
 import type { Article } from '@/shared/types';
 
 export function FavoritesList() {
   const dispatch = useAppDispatch();
   const { articles, isLoading } = useAppSelector((state) => state.favorites);
+  const { toggle } = useToggleFavorite();
 
   const handleRemove = useCallback(
     (article: Article) => {
@@ -38,21 +41,12 @@ export function FavoritesList() {
       <ArticleCardCompact
         article={item}
         isFavorite
-        onPress={() =>
-          router.push({
-            pathname: '/article/[id]',
-            params: { id: item.id, article: JSON.stringify(item) },
-          })
-        }
-        onToggleFavorite={() => {
-          dispatch(toggleFavorite(item));
-          const updated = articles.filter((a) => a.id !== item.id);
-          dispatch(persistFavorites(updated));
-        }}
+        onPress={() => navigateToArticle(item)}
+        onToggleFavorite={() => toggle(item)}
         onRemove={() => handleRemove(item)}
       />
     ),
-    [articles, dispatch, handleRemove]
+    [toggle, handleRemove]
   );
 
   if (isLoading) return <Spinner fullScreen />;

@@ -16,8 +16,14 @@ const initialState: FavoritesState = {
 export const loadFavorites = createAsyncThunk(
   'favorites/load',
   async () => {
-    const stored = await AsyncStorage.getItem(STORAGE_KEYS.FAVORITES);
-    return stored ? (JSON.parse(stored) as Article[]) : [];
+    try {
+      const stored = await AsyncStorage.getItem(STORAGE_KEYS.FAVORITES);
+      if (!stored) return [];
+      const parsed = JSON.parse(stored);
+      return Array.isArray(parsed) ? (parsed as Article[]) : [];
+    } catch {
+      return [];
+    }
   }
 );
 

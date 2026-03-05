@@ -1,8 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { baseApi } from '@/shared/api';
-import { authReducer } from '@/features/auth/model/auth-slice';
-import { favoritesReducer } from '@/features/manage-favorites/model/favorites-slice';
-import { filtersReducer } from '@/features/filter-news/model/filters-slice';
+import { authReducer } from '@/features/auth';
+import { favoritesReducer } from '@/features/manage-favorites';
+import { filtersReducer } from '@/features/filter-news';
 
 export const store = configureStore({
   reducer: {

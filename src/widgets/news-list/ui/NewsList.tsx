@@ -1,21 +1,18 @@
 import { useCallback, useState, useMemo } from 'react';
 import { FlatList, View, RefreshControl } from 'react-native';
-import { router } from 'expo-router';
-import { useGetTopHeadlinesQuery } from '@/entities/article/api';
-import { ArticleCard } from '@/entities/article/ui/ArticleCard';
+import { useGetTopHeadlinesQuery } from '@/entities/article';
+import { ArticleCard } from '@/entities/article';
 import { Spinner, ErrorView, EmptyState } from '@/shared/ui';
-import { useAppDispatch, useAppSelector } from '@/shared/lib/hooks';
-import { toggleFavorite, persistFavorites } from '@/features/manage-favorites/model';
+import { useToggleFavorite } from '@/features/manage-favorites';
+import { navigateToArticle } from '@/shared/lib/navigation';
 import type { Article } from '@/shared/types';
 
 interface NewsListProps {
-  searchQuery?: string;
   category?: string;
 }
 
-export function NewsList({ searchQuery, category }: NewsListProps) {
-  const dispatch = useAppDispatch();
-  const favorites = useAppSelector((state) => state.favorites.articles);
+export function NewsList({ category }: NewsListProps) {
+  const { favoriteIds, toggle } = useToggleFavorite();
   const [page, setPage] = useState(1);
   const [allArticles, setAllArticles] = useState<Article[]>([]);
 
@@ -36,11 +33,6 @@ export function NewsList({ searchQuery, category }: NewsListProps) {
 
   const hasMore = data ? displayArticles.length < data.totalResults : false;
 
-  const favoriteIds = useMemo(
-    () => new Set(favorites.map((a) => a.id)),
-    [favorites]
-  );
-
   function handleRefresh() {
     setPage(1);
     setAllArticles([]);
@@ -54,29 +46,16 @@ export function NewsList({ searchQuery, category }: NewsListProps) {
     }
   }
 
-  function handleToggleFavorite(article: Article) {
-    dispatch(toggleFavorite(article));
-    const updated = favoriteIds.has(article.id)
-      ? favorites.filter((a) => a.id !== article.id)
-      : [...favorites, article];
-    dispatch(persistFavorites(updated));
-  }
-
   const renderItem = useCallback(
     ({ item }: { item: Article }) => (
       <ArticleCard
         article={item}
         isFavorite={favoriteIds.has(item.id)}
-        onPress={() =>
-          router.push({
-            pathname: '/article/[id]',
-            params: { id: item.id, article: JSON.stringify(item) },
-          })
-        }
-        onToggleFavorite={() => handleToggleFavorite(item)}
+        onPress={() => navigateToArticle(item)}
+        onToggleFavorite={() => toggle(item)}
       />
     ),
-    [favoriteIds, favorites]
+    [favoriteIds, toggle]
   );
 
   const keyExtractor = useCallback((item: Article) => item.id, []);

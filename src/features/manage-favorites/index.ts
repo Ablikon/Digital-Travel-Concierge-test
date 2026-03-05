@@ -1,4 +1,5 @@
 export { FavoritesList } from './ui';
+export { useToggleFavorite } from './lib/use-toggle-favorite';
 export {
   favoritesReducer,
   toggleFavorite,

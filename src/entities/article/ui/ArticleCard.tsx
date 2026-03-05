@@ -2,6 +2,7 @@ import { Pressable, View, Text } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { ImageWithFallback } from '@/shared/ui';
 import { formatRelativeDate } from '@/shared/lib/utils';
+import { shadows } from '@/shared/config/styles';
 import type { Article } from '@/shared/types';
 
 interface ArticleCardProps {
@@ -21,13 +22,7 @@ export function ArticleCard({
     <Pressable
       onPress={onPress}
       className="mb-4 overflow-hidden rounded-2xl bg-white"
-      style={{
-        shadowColor: '#0F172A',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.06,
-        shadowRadius: 8,
-        elevation: 3,
-      }}
+      style={shadows.card}
     >
       <ImageWithFallback uri={article.urlToImage} className="h-48 w-full" />
 
@@ -51,7 +46,7 @@ export function ArticleCard({
               className="h-8 w-8 items-center justify-center rounded-full active:bg-neutral-50"
             >
               <AntDesign
-                name={isFavorite ? 'heart' : 'heart'}
+                name="heart"
                 size={18}
                 color={isFavorite ? '#EF4444' : '#CBD5E1'}
               />

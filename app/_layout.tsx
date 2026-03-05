@@ -5,7 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { StoreProvider } from '@/app/providers';
 import { ErrorBoundary } from '@/shared/ui';
-import { useAppSelector } from '@/shared/lib/hooks';
+import { useAppSelector } from '@/app/store/hooks';
 import { useNotifications } from '@/features/notifications';
 
 SplashScreen.preventAutoHideAsync();

@@ -51,3 +51,7 @@ export interface FileItem {
   downloadedAt?: string;
   uploadedAt?: string;
 }
+
+export type { IconProps } from '@expo/vector-icons/build/createIconSet';
+import type { AntDesign } from '@expo/vector-icons';
+export type AntDesignIconName = React.ComponentProps<typeof AntDesign>['name'];

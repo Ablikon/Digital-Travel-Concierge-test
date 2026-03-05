@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons, AntDesign } from '@expo/vector-icons';
-import { useAppDispatch, useAppSelector, useDebounce } from '@/shared/lib/hooks';
-import { setCategory, setSearchQuery } from '@/features/filter-news/model';
-import { loadFavorites } from '@/features/manage-favorites/model';
+import { AntDesign } from '@expo/vector-icons';
+import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
+import { useDebounce } from '@/shared/lib/hooks';
+import { setCategory, setSearchQuery, setSortBy } from '@/features/filter-news';
+import { loadFavorites } from '@/features/manage-favorites';
 import { NEWS_CATEGORIES, type NewsCategory } from '@/shared/config/constants';
 import { Chip, SearchInput } from '@/shared/ui';
 import { SortOptions } from '@/features/search-news';
@@ -15,6 +16,7 @@ export default function NewsScreen() {
   const dispatch = useAppDispatch();
   const selectedCategory = useAppSelector((state) => state.filters.selectedCategory);
   const searchQuery = useAppSelector((state) => state.filters.searchQuery);
+  const sortBy = useAppSelector((state) => state.filters.sortBy);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const debouncedQuery = useDebounce(searchQuery, 600);
@@ -67,7 +69,12 @@ export default function NewsScreen() {
           </View>
         )}
 
-        {isSearchOpen && debouncedQuery.length >= 2 && <SortOptions />}
+        {isSearchOpen && debouncedQuery.length >= 2 && (
+          <SortOptions
+            currentSort={sortBy}
+            onSortChange={(sort) => dispatch(setSortBy(sort))}
+          />
+        )}
 
         {!isSearchOpen && (
           <ScrollView

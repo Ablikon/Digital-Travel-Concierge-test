@@ -1,11 +1,11 @@
 import { useCallback, useMemo, useState } from 'react';
 import { FlatList, View } from 'react-native';
-import { router } from 'expo-router';
-import { useSearchArticlesQuery } from '@/entities/article/api';
-import { ArticleCardCompact } from '@/entities/article/ui/ArticleCardCompact';
+import { useSearchArticlesQuery } from '@/entities/article';
+import { ArticleCardCompact } from '@/entities/article';
 import { Spinner, ErrorView, EmptyState } from '@/shared/ui';
-import { useAppDispatch, useAppSelector } from '@/shared/lib/hooks';
-import { toggleFavorite, persistFavorites } from '@/features/manage-favorites/model';
+import { useAppSelector } from '@/app/store/hooks';
+import { useToggleFavorite } from '@/features/manage-favorites';
+import { navigateToArticle } from '@/shared/lib/navigation';
 import { PAGINATION } from '@/shared/config/constants';
 import type { Article } from '@/shared/types';
 
@@ -14,8 +14,7 @@ interface SearchResultsProps {
 }
 
 export function SearchResults({ query }: SearchResultsProps) {
-  const dispatch = useAppDispatch();
-  const favorites = useAppSelector((state) => state.favorites.articles);
+  const { favoriteIds, toggle } = useToggleFavorite();
   const { sortBy, dateFrom, dateTo, selectedCategory } = useAppSelector(
     (state) => state.filters
   );
@@ -44,19 +43,6 @@ export function SearchResults({ query }: SearchResultsProps) {
     return accumulated;
   }, [data, page, accumulated]);
 
-  const favoriteIds = useMemo(
-    () => new Set(favorites.map((a) => a.id)),
-    [favorites]
-  );
-
-  function handleToggleFavorite(article: Article) {
-    dispatch(toggleFavorite(article));
-    const updated = favoriteIds.has(article.id)
-      ? favorites.filter((a) => a.id !== article.id)
-      : [...favorites, article];
-    dispatch(persistFavorites(updated));
-  }
-
   function handleLoadMore() {
     if (!isFetching && data && articles.length < data.totalResults) {
       setAccumulated(articles);
@@ -69,16 +55,11 @@ export function SearchResults({ query }: SearchResultsProps) {
       <ArticleCardCompact
         article={item}
         isFavorite={favoriteIds.has(item.id)}
-        onPress={() =>
-          router.push({
-            pathname: '/article/[id]',
-            params: { id: item.id, article: JSON.stringify(item) },
-          })
-        }
-        onToggleFavorite={() => handleToggleFavorite(item)}
+        onPress={() => navigateToArticle(item)}
+        onToggleFavorite={() => toggle(item)}
       />
     ),
-    [favoriteIds, favorites]
+    [favoriteIds, toggle]
   );
 
   if (!query || query.length < 2) {

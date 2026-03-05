@@ -2,6 +2,7 @@ import { Pressable, View, Text } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { ImageWithFallback } from '@/shared/ui';
 import { formatRelativeDate } from '@/shared/lib/utils';
+import { shadows } from '@/shared/config/styles';
 import type { Article } from '@/shared/types';
 
 interface ArticleCardCompactProps {
@@ -23,13 +24,7 @@ export function ArticleCardCompact({
     <Pressable
       onPress={onPress}
       className="mb-3 flex-row overflow-hidden rounded-xl bg-white p-3"
-      style={{
-        shadowColor: '#0F172A',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.04,
-        shadowRadius: 4,
-        elevation: 2,
-      }}
+      style={shadows.cardCompact}
     >
       <ImageWithFallback uri={article.urlToImage} className="h-24 w-24 rounded-lg" />
 

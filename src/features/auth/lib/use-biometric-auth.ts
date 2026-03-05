@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from 'react';
 import * as LocalAuthentication from 'expo-local-authentication';
-import { useAppDispatch, useAppSelector } from '@/shared/lib/hooks';
+import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
 import {
   setAuthenticated,
   setBiometricAvailable,

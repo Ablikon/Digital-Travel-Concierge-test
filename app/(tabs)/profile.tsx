@@ -1,8 +1,8 @@
 import { View, Text, Pressable, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AntDesign, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useAppDispatch, useAppSelector } from '@/shared/lib/hooks';
-import { logout } from '@/features/auth/model';
+import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
+import { logout } from '@/features/auth';
 
 interface SettingsRowProps {
   icon: React.ReactNode;

@@ -5,8 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AntDesign, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { ImageWithFallback } from '@/shared/ui';
 import { formatDate } from '@/shared/lib/utils';
-import { useAppDispatch, useAppSelector } from '@/shared/lib/hooks';
-import { toggleFavorite, persistFavorites } from '@/features/manage-favorites/model';
+import { useToggleFavorite } from '@/features/manage-favorites';
 import type { Article } from '@/shared/types';
 
 export default function ArticleDetailScreen() {
@@ -15,8 +14,7 @@ export default function ArticleDetailScreen() {
     article: string;
   }>();
 
-  const dispatch = useAppDispatch();
-  const favorites = useAppSelector((state) => state.favorites.articles);
+  const { isFavorite, toggle } = useToggleFavorite();
 
   const article: Article | null = useMemo(() => {
     try {
@@ -25,11 +23,6 @@ export default function ArticleDetailScreen() {
       return null;
     }
   }, [articleJson]);
-
-  const isFavorite = useMemo(
-    () => favorites.some((a) => a.id === id),
-    [favorites, id]
-  );
 
   if (!article) {
     return (
@@ -48,11 +41,7 @@ export default function ArticleDetailScreen() {
 
   function handleToggleFavorite() {
     if (!article) return;
-    dispatch(toggleFavorite(article));
-    const updated = isFavorite
-      ? favorites.filter((a) => a.id !== article.id)
-      : [...favorites, article];
-    dispatch(persistFavorites(updated));
+    toggle(article);
   }
 
   function handleOpenWebView() {
@@ -92,7 +81,7 @@ export default function ArticleDetailScreen() {
             <AntDesign
               name="heart"
               size={20}
-              color={isFavorite ? '#EF4444' : '#CBD5E1'}
+              color={isFavorite(id ?? '') ? '#EF4444' : '#CBD5E1'}
             />
           </Pressable>
           <Pressable

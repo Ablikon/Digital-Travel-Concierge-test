@@ -1,23 +1,21 @@
 import { View } from 'react-native';
 import { SearchInput } from '@/shared/ui';
-import { useAppDispatch, useAppSelector } from '@/shared/lib/hooks';
-import { setSearchQuery } from '@/features/filter-news/model';
 
 interface SearchBarProps {
+  value: string;
+  onChangeText: (text: string) => void;
   onSubmit?: () => void;
 }
 
-export function SearchBar({ onSubmit }: SearchBarProps) {
-  const dispatch = useAppDispatch();
-  const searchQuery = useAppSelector((state) => state.filters.searchQuery);
-
+export function SearchBar({ value, onChangeText, onSubmit }: SearchBarProps) {
   return (
     <View className="px-4 py-3">
       <SearchInput
-        value={searchQuery}
-        onChangeText={(text) => dispatch(setSearchQuery(text))}
+        value={value}
+        onChangeText={onChangeText}
         placeholder="Search news articles..."
         onSubmit={onSubmit}
+        autoFocus
       />
     </View>
   );
