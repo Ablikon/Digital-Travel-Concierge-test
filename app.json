@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "scheme": "digital-travel",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
@@ -17,7 +17,6 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.digitaltravel.app",
       "infoPlist": {
-        "NSFaceIDUsageDescription": "Authenticate with Face ID to access the app",
         "NSPhotoLibraryUsageDescription": "Access your photos to upload files",
         "NSDocumentsFolderUsageDescription": "Access documents for file operations",
         "NSCameraUsageDescription": "Take photos to upload"
@@ -44,10 +43,14 @@
     },
     "plugins": [
       "expo-router",
-      "expo-local-authentication",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow Digital Travel to use Face ID for authentication."
+        }
+      ],
       "expo-document-picker",
       "expo-image-picker",
-      "expo-sharing",
       "expo-web-browser",
       [
         "expo-notifications",
@@ -58,7 +61,7 @@
       ]
     ],
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": false
     }
   }
 }

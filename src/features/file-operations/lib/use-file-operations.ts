@@ -1,10 +1,5 @@
 import { useState, useCallback } from 'react';
-import {
-  documentDirectory,
-  getInfoAsync,
-  deleteAsync,
-  createDownloadResumable,
-} from 'expo-file-system/legacy';
+import * as FileSystem from 'expo-file-system/legacy';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
 import * as Sharing from 'expo-sharing';
@@ -46,14 +41,22 @@ export function useFileOperations() {
       }
 
       const asset = result.assets[0];
-      const fileInfo = await getInfoAsync(asset.uri);
+      let fileSize = 0;
+      try {
+        const fileInfo = await FileSystem.getInfoAsync(asset.uri);
+        if (fileInfo.exists && 'size' in fileInfo) {
+          fileSize = (fileInfo as any).size || 0;
+        }
+      } catch {
+        // getInfoAsync can fail on some URIs in Expo Go
+      }
 
       const fileItem: FileItem = {
         id: Date.now().toString(),
         name: asset.fileName || `image_${Date.now()}.jpg`,
         uri: asset.uri,
         type: asset.mimeType || 'image/jpeg',
-        size: fileInfo.exists ? (fileInfo as any).size || 0 : 0,
+        size: asset.fileSize || fileSize,
         uploadedAt: new Date().toISOString(),
       };
 
@@ -110,31 +113,37 @@ export function useFileOperations() {
         setDownloadProgress(0);
         setError(null);
 
-        const fileUri = `${documentDirectory}${filename}`;
-
-        const downloadResumable = createDownloadResumable(
-          url,
-          fileUri,
-          {},
-          (progress: DownloadProgress) => {
-            const pct = progress.totalBytesWritten / progress.totalBytesExpectedToWrite;
-            setDownloadProgress(Math.round(pct * 100));
-          }
-        );
-
-        const result = await downloadResumable.downloadAsync();
-        if (!result) {
-          throw new Error('Download failed');
+        const baseDir = FileSystem.documentDirectory || FileSystem.cacheDirectory;
+        if (!baseDir) {
+          throw new Error('File system not available');
         }
 
-        const fileInfo = await getInfoAsync(result.uri);
+        const fileUri = `${baseDir}${filename}`;
+
+        const downloadResult = await FileSystem.downloadAsync(url, fileUri);
+
+        if (!downloadResult || downloadResult.status !== 200) {
+          throw new Error(`Download failed with status ${downloadResult?.status}`);
+        }
+
+        setDownloadProgress(100);
+
+        let fileSize = 0;
+        try {
+          const fileInfo = await FileSystem.getInfoAsync(downloadResult.uri);
+          if (fileInfo.exists && 'size' in fileInfo) {
+            fileSize = (fileInfo as any).size || 0;
+          }
+        } catch {
+          // size check optional
+        }
 
         const fileItem: FileItem = {
           id: Date.now().toString(),
           name: filename,
-          uri: result.uri,
-          type: result.headers['content-type'] || 'application/octet-stream',
-          size: fileInfo.exists ? (fileInfo as any).size || 0 : 0,
+          uri: downloadResult.uri,
+          type: downloadResult.headers['content-type'] || 'application/octet-stream',
+          size: fileSize,
           downloadedAt: new Date().toISOString(),
         };
 
@@ -142,8 +151,9 @@ export function useFileOperations() {
         setIsDownloading(false);
         setDownloadProgress(0);
         return fileItem;
-      } catch {
-        setError('Failed to download file. Please check the URL and try again.');
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Unknown error';
+        setError(`Download failed: ${msg}`);
         setIsDownloading(false);
         setDownloadProgress(0);
         return null;
@@ -170,7 +180,7 @@ export function useFileOperations() {
       const file = files.find((f) => f.id === fileId);
       if (file) {
         try {
-          await deleteAsync(file.uri, { idempotent: true });
+          await FileSystem.deleteAsync(file.uri, { idempotent: true });
         } catch {
           // File might already be deleted
         }

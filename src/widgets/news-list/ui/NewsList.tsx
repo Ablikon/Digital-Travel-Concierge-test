@@ -47,9 +47,10 @@ export function NewsList({ category }: NewsListProps) {
   }
 
   const renderItem = useCallback(
-    ({ item }: { item: Article }) => (
+    ({ item, index }: { item: Article; index: number }) => (
       <ArticleCard
         article={item}
+        variant={index === 0 ? 'featured' : 'standard'}
         isFavorite={favoriteIds.has(item.id)}
         onPress={() => navigateToArticle(item)}
         onToggleFavorite={() => toggle(item)}

@@ -6,7 +6,7 @@ A cross-platform mobile application built with **React Native (Expo)** that deli
 
 | Layer | Technology |
 |-------|-----------|
-| Framework | React Native (Expo SDK 55) |
+| Framework | React Native (Expo SDK 54) |
 | Language | TypeScript (strict mode) |
 | Navigation | Expo Router (file-based) |
 | State Management | Redux Toolkit + RTK Query |
@@ -42,7 +42,7 @@ A cross-platform mobile application built with **React Native (Expo)** that deli
 │   ├── article/[id].tsx    # Article detail (dynamic route)
 │   └── webview.tsx         # WebView modal
 ├── src/
-│   ├── app/                # App layer — store configuration, providers
+│   ├── app-core/           # App layer — store configuration, providers
 │   ├── widgets/            # Composite UI blocks
 │   │   ├── news-list/      # News feed with infinite scroll
 │   │   └── search-results/ # Search results list
@@ -68,8 +68,8 @@ A cross-platform mobile application built with **React Native (Expo)** that deli
 
 - **Node.js** >= 18
 - **npm** or **yarn**
-- **Expo CLI**: `npm install -g expo-cli`
-- **Expo Go** app on your device (iOS/Android) for development
+- **Expo Go** app on your device (iOS/Android) — for quick testing
+- **Xcode 17+** (macOS) — for iOS development build with Face ID support
 - **NewsAPI Key** — free at [newsapi.org/register](https://newsapi.org/register)
 
 ## Installation
@@ -85,28 +85,69 @@ npm install
 # Set up environment variables
 cp .env.example .env
 # Then edit .env and add your NewsAPI key
-
-# Start the development server
-npx expo start
 ```
 
 ## Running the App
 
+There are two ways to run the app on a physical device:
+
+### Option 1: Expo Go (Quick Start)
+
+The fastest way to preview the app. All features work except Face ID (Expo Go limitation — uses device passcode as fallback).
+
 ```bash
 # Start Expo development server
-npm start
+npx expo start
 
-# Run on iOS simulator
-npm run ios
+# Or with cache clear
+npx expo start --clear
+```
 
-# Run on Android emulator
-npm run android
+Scan the QR code with **Expo Go** (Android) or the Camera app (iOS).
 
+> **Note:** Ensure your phone and computer are on the same Wi-Fi network. If you experience timeouts, try using your phone's Personal Hotspot.
+
+### Option 2: Development Build (Full Feature Set, including Face ID)
+
+For complete native functionality including Face ID/Touch ID biometric authentication:
+
+```bash
+# Generate native iOS project
+npx expo prebuild --platform ios --clean
+
+# Install CocoaPods (requires LANG=en_US.UTF-8 for Ruby 4.0+)
+cd ios && LANG=en_US.UTF-8 pod install && cd ..
+
+# Build and run on connected device
+npx expo run:ios --device
+
+# Or run on simulator
+npx expo run:ios
+```
+
+**Requirements for development build:**
+- macOS with Xcode 17+ (for iOS 26 devices) or Xcode 16+ (for iOS 18 devices)
+- Apple Developer account (free tier is sufficient for device testing)
+- CocoaPods (`brew install cocoapods`)
+
+### Web
+
+```bash
 # Run in web browser
 npm run web
 ```
 
-Scan the QR code with **Expo Go** (Android) or the Camera app (iOS) to run on a physical device.
+## Biometric Authentication
+
+The app implements biometric authentication using `expo-local-authentication`:
+
+| Environment | Behavior |
+|-------------|----------|
+| **Development Build** (iOS/Android) | Full Face ID / Touch ID with passcode fallback |
+| **Expo Go** | Device passcode only (Expo Go limitation — no Face ID access) |
+| **Web** | Auto-authenticated (biometrics not available on web) |
+
+The implementation detects the available biometric type (Face ID, Touch ID, or Iris) and adapts the UI accordingly. See `src/features/auth/lib/use-biometric-auth.ts`.
 
 ## API Configuration
 
@@ -160,8 +201,8 @@ RTK Query provides automatic caching, request deduplication, optimistic updates,
 ### Why NativeWind?
 Tailwind CSS utility classes accelerate UI development while maintaining consistency. NativeWind brings the same DX to React Native with zero runtime cost after compilation.
 
-### Why expo-file-system/legacy?
-Expo SDK 55 introduced a new File/Directory-based API. The legacy API is used for broader compatibility with download progress callbacks and file system operations.
+### Why Expo SDK 54?
+SDK 54 provides full compatibility with the standard Expo Go app from the App Store, allowing seamless testing on physical devices. For full native features (Face ID), a development build is recommended.
 
 ## Web Deployment (Vercel)
 
@@ -171,6 +212,9 @@ The project is configured for Vercel deployment out of the box:
 # Build for web locally
 npm run build:web
 ```
+
+Set the `EXPO_PUBLIC_NEWS_API_KEY` environment variable in Vercel project settings.
+
 ## Building for Production
 
 ```bash
@@ -183,7 +227,3 @@ npx eas build --platform android
 # Export for web
 npm run build:web
 ```
-
-## License
-
-MIT

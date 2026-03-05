@@ -3,9 +3,9 @@ import { useEffect } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
-import { StoreProvider } from '@/app/providers';
+import { StoreProvider } from '@/app-core/providers';
 import { ErrorBoundary } from '@/shared/ui';
-import { useAppSelector } from '@/app/store/hooks';
+import { useAppSelector } from '@/app-core/store/hooks';
 import { useNotifications } from '@/features/notifications';
 
 SplashScreen.preventAutoHideAsync();

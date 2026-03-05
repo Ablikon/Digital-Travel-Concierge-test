@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
+import Constants from 'expo-constants';
 import type { EventSubscription } from 'expo-modules-core';
 
 Notifications.setNotificationHandler({
@@ -67,8 +68,18 @@ export function useNotifications() {
       });
     }
 
-    const tokenData = await Notifications.getExpoPushTokenAsync();
-    return tokenData.data;
+    const projectId =
+      Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId;
+    if (!projectId) {
+      return null;
+    }
+
+    try {
+      const tokenData = await Notifications.getExpoPushTokenAsync({ projectId });
+      return tokenData.data;
+    } catch {
+      return null;
+    }
   }
 
   async function sendLocalNotification(title: string, body: string, data?: Record<string, unknown>) {

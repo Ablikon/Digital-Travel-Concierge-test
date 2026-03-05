@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AntDesign } from '@expo/vector-icons';
-import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
+import { AntDesign, Ionicons } from '@expo/vector-icons';
+import { useAppDispatch, useAppSelector } from '@/app-core/store/hooks';
 import { useDebounce } from '@/shared/lib/hooks';
 import { setCategory, setSearchQuery, setSortBy } from '@/features/filter-news';
 import { loadFavorites } from '@/features/manage-favorites';
@@ -37,23 +37,37 @@ export default function NewsScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-surface-secondary" edges={['top']}>
-      <View className="border-b border-neutral-100 bg-white">
-        <View className="flex-row items-center justify-between px-5 pb-2 pt-3">
+    <SafeAreaView className="flex-1 bg-neutral-50" edges={['top']}>
+      <View className="bg-white pb-1">
+        <View className="flex-row items-center justify-between px-5 pb-3 pt-4">
           <View>
-            <Text className="text-2xl font-bold text-neutral-800">Discover</Text>
-            <Text className="mt-0.5 text-xs text-neutral-400">
+            <Text className="text-[26px] font-extrabold tracking-tight text-neutral-900">
+              Discover
+            </Text>
+            <Text className="mt-0.5 text-[13px] text-neutral-400">
               Stay updated with latest news
             </Text>
           </View>
           <Pressable
             onPress={toggleSearch}
-            className="h-10 w-10 items-center justify-center rounded-full bg-primary-50 active:bg-primary-100"
+            className="h-11 w-11 items-center justify-center rounded-2xl bg-primary-50 active:bg-primary-100"
+            style={
+              isSearchOpen
+                ? {
+                    backgroundColor: '#4F46E5',
+                    shadowColor: '#4F46E5',
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 8,
+                    elevation: 4,
+                  }
+                : undefined
+            }
           >
             <AntDesign
               name={isSearchOpen ? 'close' : 'search'}
-              size={20}
-              color="#4F46E5"
+              size={18}
+              color={isSearchOpen ? '#FFFFFF' : '#4F46E5'}
             />
           </Pressable>
         </View>
@@ -99,6 +113,11 @@ export default function NewsScreen() {
           </ScrollView>
         )}
       </View>
+
+      <View
+        className="bg-white"
+        style={{ height: 1, backgroundColor: 'rgba(0,0,0,0.04)' }}
+      />
 
       {isSearchOpen ? (
         <SearchResults query={debouncedQuery} />

@@ -1,8 +1,6 @@
 import { Tabs } from 'expo-router';
-import { AntDesign, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { Platform } from 'react-native';
-
-const TAB_BAR_HEIGHT = Platform.OS === 'ios' ? 88 : 64;
 
 export default function TabsLayout() {
   return (
@@ -12,12 +10,16 @@ export default function TabsLayout() {
         tabBarActiveTintColor: '#4F46E5',
         tabBarInactiveTintColor: '#94A3B8',
         tabBarStyle: {
-          height: TAB_BAR_HEIGHT,
+          height: Platform.OS === 'ios' ? 84 : 64,
           backgroundColor: '#FFFFFF',
-          borderTopColor: '#E2E8F0',
-          borderTopWidth: 1,
-          paddingTop: 8,
-          paddingBottom: Platform.OS === 'ios' ? 28 : 8,
+          borderTopWidth: 0,
+          paddingTop: 6,
+          paddingBottom: Platform.OS === 'ios' ? 28 : 10,
+          shadowColor: '#0F172A',
+          shadowOffset: { width: 0, height: -4 },
+          shadowOpacity: 0.06,
+          shadowRadius: 12,
+          elevation: 12,
         },
         tabBarLabelStyle: {
           fontSize: 11,
@@ -30,8 +32,12 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: 'News',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="newspaper-outline" size={size} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? 'newspaper' : 'newspaper-outline'}
+              size={22}
+              color={color}
+            />
           ),
         }}
       />
@@ -39,8 +45,12 @@ export default function TabsLayout() {
         name="favorites"
         options={{
           title: 'Favorites',
-          tabBarIcon: ({ color, size }) => (
-            <AntDesign name="heart" size={size} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? 'heart' : 'heart-outline'}
+              size={22}
+              color={color}
+            />
           ),
         }}
       />
@@ -48,8 +58,12 @@ export default function TabsLayout() {
         name="files"
         options={{
           title: 'Files',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="file-document-outline" size={size} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? 'folder' : 'folder-outline'}
+              size={22}
+              color={color}
+            />
           ),
         }}
       />
@@ -57,8 +71,12 @@ export default function TabsLayout() {
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color, size }) => (
-            <AntDesign name="user" size={size} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? 'person' : 'person-outline'}
+              size={22}
+              color={color}
+            />
           ),
         }}
       />

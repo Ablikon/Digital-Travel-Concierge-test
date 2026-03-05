@@ -3,7 +3,7 @@ import { FlatList, View } from 'react-native';
 import { useSearchArticlesQuery } from '@/entities/article';
 import { ArticleCardCompact } from '@/entities/article';
 import { Spinner, ErrorView, EmptyState } from '@/shared/ui';
-import { useAppSelector } from '@/app/store/hooks';
+import { useAppSelector } from '@/app-core/store/hooks';
 import { useToggleFavorite } from '@/features/manage-favorites';
 import { navigateToArticle } from '@/shared/lib/navigation';
 import { PAGINATION } from '@/shared/config/constants';

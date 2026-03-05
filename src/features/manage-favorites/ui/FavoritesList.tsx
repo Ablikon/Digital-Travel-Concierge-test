@@ -3,7 +3,7 @@ import { FlatList, View, Text, Alert } from 'react-native';
 import { router } from 'expo-router';
 import { ArticleCardCompact } from '@/entities/article';
 import { EmptyState, Spinner } from '@/shared/ui';
-import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/app-core/store/hooks';
 import { navigateToArticle } from '@/shared/lib/navigation';
 import { removeFavorite, persistFavorites } from '../model';
 import { useToggleFavorite } from '../lib/use-toggle-favorite';

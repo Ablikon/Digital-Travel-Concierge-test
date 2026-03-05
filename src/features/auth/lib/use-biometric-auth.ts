@@ -1,6 +1,7 @@
 import { useEffect, useCallback } from 'react';
+import { Platform } from 'react-native';
 import * as LocalAuthentication from 'expo-local-authentication';
-import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/app-core/store/hooks';
 import {
   setAuthenticated,
   setBiometricAvailable,
@@ -19,6 +20,12 @@ export function useBiometricAuth() {
   }, []);
 
   async function checkBiometricSupport() {
+    if (Platform.OS === 'web') {
+      dispatch(setBiometricAvailable(false));
+      dispatch(setLoading(false));
+      return;
+    }
+
     try {
       const compatible = await LocalAuthentication.hasHardwareAsync();
       dispatch(setBiometricAvailable(compatible));
@@ -47,6 +54,11 @@ export function useBiometricAuth() {
   const authenticate = useCallback(async (): Promise<boolean> => {
     try {
       dispatch(setLoading(true));
+
+      if (Platform.OS === 'web') {
+        dispatch(setAuthenticated(true));
+        return true;
+      }
 
       const result = await LocalAuthentication.authenticateAsync({
         promptMessage: 'Authenticate to access Digital Travel',

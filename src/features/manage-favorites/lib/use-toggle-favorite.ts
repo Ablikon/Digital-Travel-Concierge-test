@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/app-core/store/hooks';
 import { toggleFavorite, persistFavorites } from '../model/favorites-slice';
 import type { Article } from '@/shared/types';
 
